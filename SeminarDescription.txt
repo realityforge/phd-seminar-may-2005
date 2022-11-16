@@ -1,0 +1,15 @@
+Topic: A Software Architecture for Scalable, Well-Conditioned Internet Services
+Student: Peter Donald (pjdonald)
+Supervisors: Samar Singh and John Rankin
+Summary:
+
+Traditional software architectures are not well suited to the high 
+concurrency and load conditioning requirements of busy Internet 
+servers. It is not uncommon for Internet servers to experience load 
+spikes that are several orders of magnitude greater than the average 
+load. An event-driven architecture will be presented where the 
+application consists of a directed graph of stages. Each stage is a 
+reusable software component that encapsulates a subset of application 
+functionality. The stages are instrumented and tuning parameters are 
+dynamically adjusted to achieve application defined goals such as 
+an upper bound on response time or maximizing throughput. 

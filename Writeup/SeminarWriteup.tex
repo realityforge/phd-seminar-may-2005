@@ -1,0 +1,166 @@
+\documentclass[a4paper]{article}
+
+\usepackage[plainpages=false]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+
+\topmargin -5pt
+\textwidth 400pt
+\textheight 682pt
+
+\begin{document}
+
+\bibliographystyle{alpha}
+
+\title{A General Purpose Software Architecture for Scalable, Well-Conditioned Internet Services}
+\author{Peter Donald (\texttt{peter@realityforge.org})}
+\date{\today}
+\maketitle
+
+\begin{abstract} 
+Traditional software architectures are not well suited to the high concurrency and load conditioning requirements of busy Internet servers. It is not uncommon for Internet servers to experience load spikes that are several orders of magnitude greater than the average load. An event-driven architecture is presented where the application consists of a directed graph of stages. Each stage is a reusable software component that encapsulates a subset of application functionality. The stages are instrumented and tuning parameters are dynamically adjusted by independent software agents to achieve application defined goals such as an upper bound on response time or maximizing throughput. 
+\end{abstract} 
+
+\section{Introduction}
+
+This document presents a software architecture to simplify development of highly concurrent internet services. Current and future demands of highly concurrent internet services are not adequetly supported by existing software architectures. The proposed software architecture builds on the ``Staged Event-Driven Architecture'' and introduces a clearer separation of concerns. Agents responsible for tuning the parameters of a stage are indepenent of the stage and may have access to more than just local stage parameters to influence how they adjust the stage parameters. 
+
+\subsection{Internet Services Today}
+
+Internet Services are playing an increasingly important role in our lives. Internet users are likely to find themselves using one or more of the following internet services on a regular basis. 
+
+\begin{itemize}
+	\item \textbf{News Outlets:} New York Times (http://www.nytimes.com/), Scientific American (http://www.sciam.com/).
+	\item \textbf{E-Commerce:} e-Bay, Amazon.com.
+	\item \textbf{E-Mail:} Gmail, Hotmail. 
+	\item \textbf{E-Banking:} B-Pay, Net Banking.
+	\item \textbf{VOIP:} Skype.
+	\item \textbf{Instant Messaging:} ICQ, AIM, SMS, Google-Talk.
+	\item \textbf{Game Servers:} World Of Warcraft.
+	\item \textbf{References:} Wikipedia, Dictionary.Com.
+\end{itemize}
+
+\subsection{Today's Demands}
+
+Internet Services today are already highly concurrent and are subject to large variations in load. Extreme load spikes can occur for an internet services, usually when the service is most valuable and downtime is not acceptable for some services. So Internet services must be resilient to extreme load variations and must be able to scale to serve large number of requests. Some sample figures include;
+
+\begin{itemize}
+	\item \textbf{Yahoo:} 1.2 billion page views / day
+	\item \textbf{AOL Web Caches:} 10 billion hits / day
+	\item \textbf{Google:} 290 million searches / day
+\end{itemize}
+
+Internet services must also be easy to create and deploy to facilitate creation of the services in the firsst place. Static websites, PHP and Java servlets are all used to create todays web services.
+
+In summary, Internet Services Today must be;
+
+\begin{itemize}
+	\item highly concurrent
+	\item resiliient to load
+	\item easy to create and deploy
+\end{itemize}
+
+\subsection{Tomorrows Demands}
+
+The ITU has a vision for the future of communication networks that would increase the demands on internet services. 
+
+\subsubsection{Location Aware}
+
+Devices will be able to determine their location and adjust their behaviour accordingly. A mobile phone may go into silent mode if it determines it is in a movie theater, a library or lecture hall. A PDA may be able to present a map from current location to the nearest ice cream store by receiving GPS positioning data.
+
+\subsubsection{Broader Range of Connected Devices On Network}
+
+The number and variety of devices that are connected in a network will dramatically increase. Phones, PDAs, PCs, Gaming Devices, Set-Top Boxes, Fridges, heart-rate monitors (during exercise), vehicles etc will all become connected and each device will have varying capabilities and needs.
+
+\subsubsection{Operations in times of Crisis}
+
+During times of crisis, essential services will be given priority over non-essential services. 911 Phone service will be capable of being transmitted over network and features such as emergency broadcast will be enabled by the infrastructure of the internet.
+
+\subsubsection{More Secure, Robust Networks}
+
+The network will less susceptible to spam, phishing, adware etc and end users will be able to have a higher level of trust in online services. Many of the Internet Services in place today were developed when the network was smaller and more open but with big buisness and consumers moving to rely on the internet, computer crimes have become a major problem. Security will no longer be an afterthought but be integral to future network services.
+
+\subsubsection{Everything will have a presence in cyberspace}
+
+Many devices in the physical world will have a presence in the digital world. You will be able to pay for goods at a vending machine electronically or browse the contents of said vending machine before walking down to it. RFID chips in foods will make it possible for the cupboard or fridge to monitor levels of food that is stock and suggest items to be added to shopping list.
+
+\section{Scalable, Well-Conditioned Services}
+
+So what does it mean to be Scalable and Well-Conditioned? 
+
+\begin{description}
+\item \textbf{Scalable:} Software capable of handling 10,000's of simultaneous connections.
+\item \textbf{Well-Conditioned:} Software will gracefully degrade service as load increases. Software must not ``meltdown'' when extreme load peaks occur.
+\end{description}
+
+\subsection{Expect Overload}
+
+Internet Services must be developed with the expectation of overload. Overload of an Internet Service often occurs at the time when the Internet Service is of the greatest value and the service should be engineered to gracefully degrade service and maintain the greatest value to agents using the service. 
+
+Flash crowds occur because there is often a large correlation in user demand. Consider;
+
+\begin{itemize}
+	\item The ``Slashdot Effect'' can suddenly increase interest in a website when that website is linked from the popular news service slashdot.org.
+	\item Earthquakes have dramatically increased demand for the USGS Pasadena Office web site.
+	\item The launch of the World of Warcraft game placed a huge demand on the game servers.
+	\item CNN received 30,000 hits/ sec on Sept. 11th causing 2.5 hours of downtime.
+\end{itemize}
+
+Peak load can be several orders of magnitude greater than the average which makes over provisioning infeasible. The internet service needs to have a strategy to maximize the value of the service during these times of overload.
+
+\subsection{Software Architectures}
+
+Applications with high concurrency demands are hard to write. One of the challenges that this research attempts to address is making it easier to develope high concurrency applications. Often the particular toolkit chosen will dictate the level of scalability that can be achieved and the level of complexity required to achieve that level of scalability. 
+
+\begin{itemize}
+\item ``PHP'' vs ``Servlets and JDBC'' vs ``EJB and Presentation Layer''.
+\item Existing software toolkits are usually limited to specific application domain or models.
+\end{itemize}
+
+Many frameworks and operating systems are developed to virtualize resources to provide maximum resource transparency. There are a number of reasons that this does not make sense in the context of a high concurrency application framework. The most obvious drawback is that it does not give the application feedback about the cost of operations (ie page faults, access speeds for disks) and it does not allow the application to participate in resource allocation and scheduling. Operating systems may support static resource containment such as CPU or memory limits but rarely does it support dynamically adjustable resource containment.
+
+Different Internet Services are created with different concurrency strategies. These strategies include;
+
+\begin{itemize}
+\item Thread-based and Process-based Concurrency
+\item Event-based Concurrency
+\item Staged-Event Driven Architecture (SEDA), a hybrid of the above concurrency strategies
+\end{itemize}
+
+\subsubsection{Thread-based and Process-based Concurrency}
+
+Thread-based Concurrency and Process-based Concurrency are different strategies but for the purpose of this document we will treat them interchangably. Every task is allocated to a separate thread or process and the thread or process only becomes free after the task is completed. The tasks are usually coarse grained such as a HTTP connection or a HTTP request.
+
+High resource usage makes thread or process based concurrency inappropriate for massive scalability. There is significant context switch overhead and associated per-thread stack space. Both threads and processes are also likely to have overhead with synchronization primitives such as contended locks. Even with light-weight user-land thread implementations it is often difficult to more than 8000 threads on x86 hardware.
+
+Thread or process based concurrency is designed for time-sharing systems. The OS multiplexes many ``virtual machines'' on the hardware but usually does not allow applications to directly participate in scheduling of the virtual machines.
+
+Consider the example of a HTTP server using thread or process based concurrency. A single process server is not really viable as it can not handle simultaneous requests and a single slow request would lock out all other users to the HTTP service.
+
+A multi-process server can handle multiple requests but a slow modem user can still tie up a single process. The number of processes usually has an upper bound to limit thrashing and performance degradation. Unfortunately the estimate of the number of processes is difficult to get right. The administrator must take in to account the speeds of the users connecting to the server and the resource utilization required for each request. The Apache HTTPD 1.x server uses this model and has a limit of 150 processes out of the box.
+
+\subsubsection{Event-based Concurrency}
+
+Event-based Concurrency requires a limited number of threads or processes to handle event streams, usually there is one thread per CPU. Each task requires a simple data structure rather than thread stack and associated thread-local values. Each task is broken down into a set of events that are executed based 
+
+The software is no longer limited by the OS support for threads. There is also far less overhead, each task requires a simple data structure rather than a thread stack and associated thread local values. This reduced resource means that the software can usually handle a larger number of simultaneous tasks. The application can also participate in event scheduling and increase performance using application specific knowledge by using algorythms such as Shortest Remaining Processing Time. A slow task also does not degrade performance of other tasks by tieing up the system.
+
+Event-based concurrency does have a number of drawbacks. The software support for event-based concurrency is extremely limited with limited OS support and limited language support outside specialized languages. This tends to mean that systems are developed in an ad-hoc manner and reusable code is rarely present. Debugging is extremely difficult as each event can generate zero or more events that can all be independently scheduled and executed and multiple event flows are difficult to distinguish. Resource management also becomes far more difficult as you can not rely on the OS to clean up any ``dangling'' resources such as unclosed file handles. Software must never block as that would cause a stall of the entire thread or process. This is very difficult when you consider page faults or garbage collection in managed runtimes.
+
+\subsubsection{Staged-Event Driven Architecture}
+
+The Staged-Event Driven Architecture (SEDA) is a hybrid of the above concurrency strategies. SEDA breaks the application down into stages separated by queues. Each stage has an EventHandler that is responsible for implementing the stage specific logic. The application essentially becoems a directed graph of stages.
+
+Each stage has a pool of threads and each thread retrieves events from a queue and passes events to the EventHandler. This means that the EventHandler need not be completely non-blocking which drastically decreases the complexity of writing the application logic.
+
+
+
+
+
+%In March 2006, 68.1\% of North American population is an internet user [See http://www.internetworldstats.com/stats.htm]. In the period 2000 to 2005 Between increase of 108.9\% . Ac
+
+
+%This document describes a software architecture for developing highly concurrent internet services. We begin describing the demands of current internet services and predicted demands of future internet services to establish a set of requirements for any candidate software architecture. Past software architectures have used thread-based, process-based, event-based or hybrid concurrency strategies and we outline the advantages and disadvantages of the different strategies with respect to our established requirements. The proposed software architecture defines the application as a directed graph of stages. 
+
+\end{document}
+
